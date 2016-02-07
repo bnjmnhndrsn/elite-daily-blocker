@@ -1,13 +1,10 @@
-var matches = ['youtube.com', 'nestio.com'];
+var matches = ['elitedaily.com', 'elitedai.ly'];
 var idx;
 var parentNode;
 
 function isMatch(href) {
     for (var i = 0; i < matches.length; i++) {
-        console.log(matches[i]);
-        console.log(href);
         if (href.match(matches[i])) {
-            console.log(href);
             return true;
         }
     }
@@ -51,4 +48,5 @@ function getParentNode(){
 
 parseFeed();
 
-setInterval(parseFeed, 3000);
+var debounced = _.debounce(parseFeed, 100);
+document.addEventListener('scroll', debounced);
