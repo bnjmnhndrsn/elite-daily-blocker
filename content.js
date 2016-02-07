@@ -1,6 +1,6 @@
-var matches = ['elitedaily.com', 'elitedai.ly'];
-var idx;
-var parentNode;
+var storyContainerSelector = "._5jmm";
+var matches = ['elitedaily.com', 'elitedai.ly', 'youtube.com', 'youtu.be', 'ghostbed.com', 'huff.to'];
+var idx = 0;
 
 function isMatch(href) {
     for (var i = 0; i < matches.length; i++) {
@@ -20,20 +20,14 @@ function hasMatchedLink (nodeList) {
 }
 
 function parseFeed(){
-    if (!parentNode || !parentNode.parentElement) {
-        idx = 1;
-        parentNode = getParentNode();
-    }
+    var nodes = getNodes();
     
-    if (!parentNode) {
-        return;
-    }
-    
-    for (; idx < parentNode.children.length; idx++) {
-        var node = parentNode.children[idx];
+    for (; idx < nodes.length; idx++) {
+        var node = nodes[idx];
         var anchors = node.querySelectorAll('a');
         if (hasMatchedLink(anchors)) {
             console.log('match found');
+            togglePageAction(true);
             node.style.display = 'none';
         } else {
             console.log('no match found');
@@ -41,12 +35,20 @@ function parseFeed(){
     }
 }
 
-function getParentNode(){
-    var container = document.getElementById('newsFeedHeading');
-    return container ? container.parentElement : null;
+function getNodes(){
+    return document.querySelectorAll(storyContainerSelector);
 }
 
-parseFeed();
+function togglePageAction(val) {
+    chrome.runtime.sendMessage({
+        method: 'togglePageAction',
+        data: {
+            toggle: val
+        }
+    });
+}
 
+togglePageAction(false);
+parseFeed();
 var debounced = _.debounce(parseFeed, 100);
 document.addEventListener('scroll', debounced);

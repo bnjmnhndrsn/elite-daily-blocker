@@ -1,6 +1,13 @@
-// listen for any changes to the URL of any tab.
-chrome.tabs.onUpdated.addListener(function(id, info, tab){
-    if (tab.url.toLowerCase().indexOf("facebook.com") > -1){
-        chrome.pageAction.show(tab.id);
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.method == "togglePageAction") {
+        togglePageAction(sender.tab.id, request.data.toggle);
     }
-});
+ });
+
+function togglePageAction(id, val){
+    if (val) {
+        chrome.pageAction.show(id);
+    } else {
+        chrome.pageAction.hide(id);
+    }
+}
