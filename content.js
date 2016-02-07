@@ -1,6 +1,6 @@
 var storyContainerSelector = "._5jmm";
+var checked = {};
 var matches = ['elitedaily.com', 'elitedai.ly', 'youtube.com', 'youtu.be', 'ghostbed.com', 'huff.to'];
-var idx = 0;
 
 function isMatch(href) {
     for (var i = 0; i < matches.length; i++) {
@@ -22,16 +22,17 @@ function hasMatchedLink (nodeList) {
 function parseFeed(){
     var nodes = getNodes();
     
-    for (; idx < nodes.length; idx++) {
+    for (var idx = 0; idx < nodes.length; idx++) {
         var node = nodes[idx];
+        if (checked[node.id]) {
+            continue;
+        }
+        checked[node.id] = true;
+        
         var anchors = node.querySelectorAll('a');
         if (hasMatchedLink(anchors)) {
-            console.log('match found');
-            togglePageAction(true);
-            node.style.display = 'none';
-        } else {
-            console.log('no match found');
-        }
+            addToBlackList(node)
+        } 
     }
 }
 
@@ -46,6 +47,19 @@ function togglePageAction(val) {
             toggle: val
         }
     });
+}
+
+function addToBlackList(node) {
+    var profileLink = node.querySelector('.fwb a');
+    chrome.runtime.sendMessage({
+        method: 'addToBlackList',
+        data: {
+            href: profileLink.href,
+            name: profileLink.textContent
+        }
+    });
+    togglePageAction(true);
+    node.style.opacity = .5;
 }
 
 togglePageAction(false);
